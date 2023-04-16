@@ -18,7 +18,6 @@ const Footer = () => {
     };
     getFooter();
   }, []);
-  console.log(footer);
 
   return (
     <div className="bg-secondary text-white">
