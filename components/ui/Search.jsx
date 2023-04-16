@@ -7,10 +7,11 @@ import axios from "axios";
 import { useEffect } from "react";
 import Input from "../form/Input";
 import { useRouter } from "next/router";
+import { CSSProperties } from "react";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const Search = ({ setIsSearchModal }) => {
   const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState([]);
   const router = useRouter();
 
@@ -21,19 +22,24 @@ const Search = ({ setIsSearchModal }) => {
           `${process.env.NEXT_PUBLIC_API_URL}/products`
         );
         setProducts(res.data);
+        setFiltered(res.data.slice(0, 5));
       } catch (error) {
         console.log(error);
       }
     };
-    getProducts();
+    setTimeout(() => {
+      getProducts();
+    }, 400);
   }, []);
 
   const handleSearch = (e) => {
-
-    setSearch(e.target.value);
-    const searchFilter = products.filter((product) => product.title.toLowerCase().inCludes(e.target.value.toLowerCase()))
-
-  }
+    const searchFilter = products
+      .filter((product) =>
+        product.title.toLowerCase().includes(e.target.value.toLowerCase())
+      )
+      .slice(0.5);
+    setFiltered(searchFilter);
+  };
 
   console.log(products);
   return (
@@ -45,30 +51,36 @@ const Search = ({ setIsSearchModal }) => {
             <Input placeholder="Search..." onChange={handleSearch} />
             {products.length > 0 ? (
               <ul className="mt-4">
-                {products.slice(0, 5).map((product) => (
-                  <li
-                    className="flex items-center justify-between p-1 hover:bg-primary transition-all px-2 cursor-pointer"
-                    key={product._id}
-                    onClick={() => {
-                      router.push(`/product/${product?._id}`);
-                      setIsSearchModal(false);
-                    }}
-                  >
-                    <div className="relative flex">
-                      <Image
-                        src={product?.img}
-                        alt={product?.title}
-                        width={48}
-                        height={48}
-                      />
-                    </div>
-                    <span className="font-bold">{product?.title}</span>
-                    <span className="font-bold">${product?.prices[0]}</span>
-                  </li>
-                ))}
+                {filtered.length > 0 ? (
+                  filtered.map((product) => (
+                    <li
+                      className="flex items-center justify-between p-1 hover:bg-primary transition-all px-2 cursor-pointer"
+                      key={product._id}
+                      onClick={() => {
+                        router.push(`/product/${product?._id}`);
+                        setIsSearchModal(false);
+                      }}
+                    >
+                      <div className="relative flex">
+                        <Image
+                          src={product?.img}
+                          alt={product?.title}
+                          width={48}
+                          height={48}
+                        />
+                      </div>
+                      <span className="font-bold">{product?.title}</span>
+                      <span className="font-bold">${product?.prices[0]}</span>
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-center font-semibold">No results found!</p>
+                )}
               </ul>
             ) : (
-              ""
+              <div className="flex justify-center items-center mt-3">
+                <PulseLoader color="#fca311" />
+              </div>
             )}
             <button
               className="absolute  top-4 right-4"
