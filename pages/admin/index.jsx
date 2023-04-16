@@ -3,11 +3,27 @@ import Link from "next/link";
 import Input from "../../components/form/Input";
 import Title from "../../components/ui/Title";
 import { adminSchema } from "../../schema/admin";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const Login = () => {
+  const { push } = useRouter();
+
   const onSubmit = async (values, actions) => {
-    await new Promise((resolve) => setTimeout(resolve, 4000));
-    actions.resetForm();
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin`,
+        values
+      );
+      if (res.status === 200) {
+        actions.resetForm();
+        toast.success("Admin Login Success!");
+        push("/admin/profile");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const { values, errors, touched, handleSubmit, handleChange, handleBlur } =
     useFormik({
@@ -68,6 +84,22 @@ const Login = () => {
       </form>
     </div>
   );
+};
+
+export const getServerSideProps = (ctx) => {
+  //Sayfamız yüklenirken api'ye request atarız ve cookie varsa onu myCookie değişkenine alırız yoksa da boş bir string yaparız.
+  const myCookie = ctx.req.cookies || "";
+  if (myCookie.token === process.env.ADMIN_TOKEN) {
+    return {
+      redirect: {
+        destination: "/admin/profile",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {},
+  };
 };
 
 export default Login;
