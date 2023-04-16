@@ -38,7 +38,7 @@ const Footer = () => {
               </a>
               <a href={`mailto:${footer?.email}`}>
                 <i className="fa fa-envelope"></i>
-                <span className="inline-block ml-2">{footer?.email}</span>
+                <span className="inline-block ml-2">demo@gmail.com</span>
               </a>
             </div>
           </div>
@@ -49,7 +49,7 @@ const Footer = () => {
               {footer?.socialMedia?.map((item) => (
                 <a
                   href={item?.link}
-                  className="w-8 h-8 grid place-content-center bg-white text-secondary rounded-full"
+                  className="w-8 h-8 grid place-content-center bg-white text-secondary rounded-full hover:text-white hover:bg-primary transition-all"
                   key={item._id}
                   target="_blank"
                   rel="noreferrer"
